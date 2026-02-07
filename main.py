@@ -1,0 +1,1 @@
+print('CR7MENTA7ITI')
