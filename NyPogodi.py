@@ -53,7 +53,7 @@ class Game:
 
         # Флаг для музыки
         self.music_playing = False
-        self.music_enabled = True  # Флаг включения/выключения звука
+        self.music_enabled = True
 
         try:
             self.RESAMPLE_RESIZE = Image.Resampling.LANCZOS
@@ -69,7 +69,7 @@ class Game:
         if not os.path.exists(self.sprites_dir):
             os.makedirs(self.sprites_dir)
 
-        # Создаем папку для звуков если её нет
+        # Создаем папку для звуков
         self.sounds_dir = 'sounds'
         if not os.path.exists(self.sounds_dir):
             os.makedirs(self.sounds_dir)
@@ -128,8 +128,7 @@ class Game:
             threading.Thread(target=self._play_music_loop, args=(music_file,), daemon=True).start()
 
     def _play_music_loop(self, music_file):
-        """Циклическое воспроизведение в отдельном потоке с пониженной громкостью"""
-        # Получаем длительность трека один раз
+        """Циклическое воспроизведение"""
         try:
             with wave.open(music_file, 'rb') as wav:
                 duration = wav.getnframes() / wav.getframerate()
@@ -138,12 +137,11 @@ class Game:
 
         while self.music_playing:
             try:
-                # Устанавливаем громкость (0-65535), 20000 - примерно 30% громкости
+                # Устанавливаем громкость
                 volume = 20000
-                # Используем waveOutSetVolume через ctypes для установки громкости
                 import ctypes
                 winmm = ctypes.windll.winmm
-                # Установка громкости для левого и правого каналов
+                # Установка громкости каналов
                 winmm.waveOutSetVolume(0, volume + (volume << 16))
 
                 winsound.PlaySound(music_file, winsound.SND_FILENAME | winsound.SND_ASYNC)
@@ -186,12 +184,10 @@ class Game:
         else:
             self.stop_music()
 
-        # Обновляем отображение кнопки звука
         self.draw_sound_button()
 
     def draw_sound_button(self):
-        """Отрисовка кнопки звука в левом верхнем углу"""
-        # Удаляем старую кнопку если есть
+        """кнопка звука в левом верхнем углу"""
         if 'sound_button' in self.ui_elements:
             self.canvas.delete(self.ui_elements['sound_button'])
 
@@ -543,7 +539,6 @@ class Game:
         if bg:
             self.canvas.create_image(0, 0, anchor='nw', image=bg)
 
-        # Кнопка звука в игре (левый верхний угол)
         self.draw_sound_button()
 
         scale_x = self.WIDTH / self.BASE_WIDTH
@@ -758,7 +753,6 @@ class Game:
 
             self.game_over_elements.extend([go_text, fs_text, r_text])
 
-            # Кнопка звука при game over (левый верхний угол)
             self.draw_sound_button()
 
     def start_game(self):
